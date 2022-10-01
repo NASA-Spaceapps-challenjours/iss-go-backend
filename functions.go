@@ -9,10 +9,12 @@ import (
 )
 
 func updateIssLocation(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, getIssLocation(time.Now().UTC()))
 }
 
 func getPastPresentFutureLoc(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	var locations []issCoords
 	timeOfRequest := time.Now().UTC().UnixMilli()
 
