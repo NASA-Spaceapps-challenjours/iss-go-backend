@@ -8,7 +8,7 @@ func main() {
 	// r.Static("/out", "./out")
 	// r.Use(static.Serve("/", static.LocalFile("./out", true)))
 
-	r.GET("/test", sendTestData)
+	r.GET("/updateIssLocation", updateIssLocation)
 	r.Run()
 
 	getIssLocation()

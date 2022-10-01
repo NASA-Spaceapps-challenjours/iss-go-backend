@@ -6,6 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func sendTestData(c *gin.Context) {
+func updateIssLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, getIssLocation())
 }
