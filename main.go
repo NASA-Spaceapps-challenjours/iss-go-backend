@@ -1,12 +1,12 @@
 package main
 
 import (
-	"time"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
 
-var calculatedLocations map[time.Time]issCoords
+var calculatedLocations sync.Map
 
 func main() {
 	r := gin.Default()

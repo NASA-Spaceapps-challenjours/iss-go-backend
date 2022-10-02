@@ -24,15 +24,18 @@ func getPastPresentFutureLoc(c *gin.Context) {
 
 	// Check for up to 20 seconds before the 90 mins and delete any values in map
 	for outOfRange := timeOfRequest - (NINETY_MINS_IN_MILLIS + 20000); outOfRange < timeOfRequest-NINETY_MINS_IN_MILLIS; outOfRange++ {
-		delete(calculatedLocations, time.UnixMicro(outOfRange).UTC())
+		calculatedLocations.Delete(outOfRange)
 	}
 	c.JSON(http.StatusOK, locations)
 }
 
 func calculateIssLocation(timeToCheck time.Time) issCoords {
 	// Check if we've already calculated the coordinates for this time
-	if val, ok := calculatedLocations[timeToCheck]; ok {
-		return val
+	if val, ok := calculatedLocations.Load(timeToCheck); ok {
+		coords, isCoords := val.(issCoords)
+		if isCoords {
+			return coords
+		}
 	}
 
 	// Create the Satellite object needed to propagate (calculate) the location at the given time
@@ -66,6 +69,6 @@ func calculateIssLocation(timeToCheck time.Time) issCoords {
 	}
 
 	foundCoords := issCoords{Latitude: latitudeInDeg, Longitude: longitudeInDeg, Altitude: altitude}
-	calculatedLocations[timeToCheck] = foundCoords
+	calculatedLocations.Store(timeToCheck, foundCoords)
 	return foundCoords
 }
