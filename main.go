@@ -9,7 +9,7 @@ func main() {
 
 	// r.Static("/out", "./out")
 	// r.Use(static.Serve("/", static.LocalFile("./out", true)))
-	r.GET("/updateIssLocation", updateIssLocation)
+	r.GET("/getIssLocation", getIssLocation)
 	r.GET("/getPastFuturePresentIssLocation", getPastPresentFutureLoc)
 	r.Run()
 }

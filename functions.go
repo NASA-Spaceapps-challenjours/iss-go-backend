@@ -8,9 +8,9 @@ import (
 	"github.com/joshuaferrara/go-satellite"
 )
 
-func updateIssLocation(c *gin.Context) {
+func getIssLocation(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
-	c.JSON(http.StatusOK, getIssLocation(time.Now().UTC()))
+	c.JSON(http.StatusOK, calculateIssLocation(time.Now().UTC()))
 }
 
 func getPastPresentFutureLoc(c *gin.Context) {
@@ -19,12 +19,12 @@ func getPastPresentFutureLoc(c *gin.Context) {
 	timeOfRequest := time.Now().UTC().UnixMilli()
 
 	for lookForTime := timeOfRequest - 90*60000; lookForTime < timeOfRequest+90*60000; lookForTime += 5000 {
-		locations = append(locations, getIssLocation(time.UnixMilli(lookForTime).UTC()))
+		locations = append(locations, calculateIssLocation(time.UnixMilli(lookForTime).UTC()))
 	}
 	c.JSON(http.StatusOK, locations)
 }
 
-func getIssLocation(timeToCheck time.Time) issCoords {
+func calculateIssLocation(timeToCheck time.Time) issCoords {
 	iss := satellite.TLEToSat(ISS_LINE_1, ISS_LINE_2, ISS_GRAVITY)
 	position, _ := satellite.Propagate(iss, timeToCheck.Year(), int(timeToCheck.Month()), timeToCheck.Day(), timeToCheck.Hour(),
 		timeToCheck.Minute(), timeToCheck.Second())
