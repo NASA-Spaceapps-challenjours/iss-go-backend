@@ -116,7 +116,7 @@ func calculateIssLocation(timeToCheck time.Time) coords {
 		longitudeInDeg -= 360
 	}
 
-	foundCoords := coords{Latitude: latitudeInDeg, Longitude: longitudeInDeg, Altitude: altitude}
+	foundCoords := coords{Latitude: latitudeInDeg, Longitude: longitudeInDeg, Altitude: altitude * 1000}
 	calculatedLocations.Store(timeToCheck, foundCoords)
 	return foundCoords
 }
