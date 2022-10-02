@@ -25,12 +25,21 @@ func getPastPresentFutureLoc(c *gin.Context) {
 }
 
 func calculateIssLocation(timeToCheck time.Time) issCoords {
+	// Check if we've already calculated the coordinates for this time
+	if val, ok := calculatedLocations[timeToCheck]; ok {
+		return val
+	}
+
+	// Create the Satellite object needed to propagate (calculate) the location at the given time
 	iss := satellite.TLEToSat(ISS_LINE_1, ISS_LINE_2, ISS_GRAVITY)
 	position, _ := satellite.Propagate(iss, timeToCheck.Year(), int(timeToCheck.Month()), timeToCheck.Day(), timeToCheck.Hour(),
 		timeToCheck.Minute(), timeToCheck.Second())
+	// Calculate julian day to find theta to calculate latitde, longitude, and altitude
 	jday := satellite.JDay(timeToCheck.Year(), int(timeToCheck.Month()), timeToCheck.Day(), timeToCheck.Hour(), timeToCheck.Minute(), timeToCheck.Second())
 	theta := satellite.ThetaG_JD(jday)
 	altitude, _, latLong := satellite.ECIToLLA(position, theta)
+
+	// Convert latitude and longitude to degrees
 	latitudeInDeg := latLong.Latitude * satellite.RAD2DEG
 
 	for latitudeInDeg < -180 {
@@ -40,6 +49,7 @@ func calculateIssLocation(timeToCheck time.Time) issCoords {
 	for latitudeInDeg > 180 {
 		latitudeInDeg -= 360
 	}
+
 	longitudeInDeg := latLong.Longitude*satellite.RAD2DEG + 360
 	for longitudeInDeg < -180 {
 		longitudeInDeg += 360
