@@ -1,7 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
+	"log"
+	"math"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +20,7 @@ func getIssLocation(c *gin.Context) {
 
 func getPastPresentFutureLoc(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
-	var locations []issCoords
+	var locations []coords
 	timeOfRequest := time.Now().UTC().UnixMilli()
 
 	for lookForTime := timeOfRequest - NINETY_MINS_IN_MILLIS; lookForTime < timeOfRequest+NINETY_MINS_IN_MILLIS; lookForTime += 5000 {
@@ -29,10 +34,53 @@ func getPastPresentFutureLoc(c *gin.Context) {
 	c.JSON(http.StatusOK, locations)
 }
 
-func calculateIssLocation(timeToCheck time.Time) issCoords {
+func getClosestCity(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	loc := calculateIssLocation(time.Now())
+	minDist := 1.6e307
+	closestCity := cities[0]
+	for _, ciudad := range cities {
+		distanceFromLocation := math.Sqrt(math.Pow(ciudad.Latitude-loc.Longitude, 2) + math.Pow(ciudad.Longitude-loc.Longitude, 2))
+		if distanceFromLocation < minDist {
+			closestCity = ciudad
+		}
+	}
+	c.JSON(http.StatusOK, closestCity)
+
+}
+
+func getCities() {
+	csvFile, err := os.Open("./worldcities.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer csvFile.Close()
+
+	r := csv.NewReader(csvFile)
+
+	if _, err := r.Read(); err != nil {
+		log.Fatal(err)
+	}
+
+	csvCities, err := r.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, csvCity := range csvCities {
+		latitude, _ := strconv.ParseFloat(csvCity[2], 64)
+		longitude, _ := strconv.ParseFloat(csvCity[3], 64)
+		cityName := csvCity[0]
+		newCity := city{Latitude: latitude, Longitude: longitude, Name: cityName}
+		cities = append(cities, newCity)
+	}
+}
+
+func calculateIssLocation(timeToCheck time.Time) coords {
 	// Check if we've already calculated the coordinates for this time
 	if val, ok := calculatedLocations.Load(timeToCheck); ok {
-		coords, isCoords := val.(issCoords)
+		coords, isCoords := val.(coords)
 		if isCoords {
 			return coords
 		}
@@ -68,7 +116,7 @@ func calculateIssLocation(timeToCheck time.Time) issCoords {
 		longitudeInDeg -= 360
 	}
 
-	foundCoords := issCoords{Latitude: latitudeInDeg, Longitude: longitudeInDeg, Altitude: altitude}
+	foundCoords := coords{Latitude: latitudeInDeg, Longitude: longitudeInDeg, Altitude: altitude}
 	calculatedLocations.Store(timeToCheck, foundCoords)
 	return foundCoords
 }

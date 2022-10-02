@@ -15,7 +15,8 @@ It will then be running at `http://localhost:8080/`
 Projects used in this backend include
 - [joshuaferrara/go-satellite](https://github.com/joshuaferrara/go-satellite)
 - [gin-gonic/gin](https://github.com/gin-gonic/gin)
-- [gin-gonic/gin-contrib](https://github.com/gin-gonic/gin-contrib)
+- [gin-gonic/gin-contrib](https://github.com/gin-gonic/contrib)
+- [Cities Database](https://simplemaps.com/data/world-cities) - licensed granted through Creative Common
 - and the standard go library
 
 API Reference:
