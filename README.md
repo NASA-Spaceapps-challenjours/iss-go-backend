@@ -10,8 +10,19 @@ go mod tidy
 go run .
 ```
 
+It will then be running at `http://localhost:8080/`
+
 Projects used in this backend include
-- [joshuaferrara/go-satellite] (https://github.com/joshuaferrara/go-satellite)
-- [gin-gonic/gin] (https://github.com/gin-gonic/gin)
-- [gin-gonic/gin-contrib] (https://github.com/gin-gonic/gin-contrib)
+- [joshuaferrara/go-satellite](https://github.com/joshuaferrara/go-satellite)
+- [gin-gonic/gin](https://github.com/gin-gonic/gin)
+- [gin-gonic/gin-contrib](https://github.com/gin-gonic/gin-contrib)
 - and the standard go library
+
+API Reference:
+
+All of these are `GET` requests:
+- `/getIssLocation` - gets the current Lattitude, Longitude, and altitude (km) of the ISS
+- `/getPastFuturePresentIssLocation` - gets past, present, and future ISS locations up to 90 minutes
+
+__TO BE IMPLEMENTED__:
+- `/getClosestCities` - gets the closest cities
