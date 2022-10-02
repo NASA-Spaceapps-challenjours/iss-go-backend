@@ -19,6 +19,7 @@ function addPlaceMarker() {
   placemark.alwaysOnTop = true;
   placemark.attributes = placemarkAttributes;
   placemarkLayer.addRenderable(placemark);
+
   return placemark;
 }
 
@@ -109,13 +110,9 @@ placemark.highlightAttributes = highlightAttributes;
 placemarkLayer.addRenderable(placemark);
 
 // ISS Position values
-var postlat = 10.0;
-var postlon = -125.0;
-var postalt = 800000.0;
-
-var lat = postlat;
-var lon = postlon;
-var alt = postalt;
+var lat = 10.0;
+var lon = -125.0;
+var alt = 800000.0;
 
 var position = new WorldWind.Position(lat, lon, alt);
 var config = { dirPath: "/models/" };
