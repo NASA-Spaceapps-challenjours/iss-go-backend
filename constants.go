@@ -6,3 +6,5 @@ const ISS_LINE_2 = "2 25544  51.6446 171.3620 0002537 314.8685 180.8010 15.50443
 
 // Gravity taken from joshuaferrara/go-satellite satellite_suite_test.go line 43
 const ISS_GRAVITY = "wgs84"
+
+const NINETY_MINS_IN_MILLIS = 90 * 60000

@@ -18,8 +18,13 @@ func getPastPresentFutureLoc(c *gin.Context) {
 	var locations []issCoords
 	timeOfRequest := time.Now().UTC().UnixMilli()
 
-	for lookForTime := timeOfRequest - 90*60000; lookForTime < timeOfRequest+90*60000; lookForTime += 5000 {
+	for lookForTime := timeOfRequest - NINETY_MINS_IN_MILLIS; lookForTime < timeOfRequest+NINETY_MINS_IN_MILLIS; lookForTime += 5000 {
 		locations = append(locations, calculateIssLocation(time.UnixMilli(lookForTime).UTC()))
+	}
+
+	// Check for up to 20 seconds before the 90 mins and delete any values in map
+	for outOfRange := timeOfRequest - (NINETY_MINS_IN_MILLIS + 20000); outOfRange < timeOfRequest-NINETY_MINS_IN_MILLIS; outOfRange++ {
+		delete(calculatedLocations, time.UnixMicro(outOfRange).UTC())
 	}
 	c.JSON(http.StatusOK, locations)
 }
@@ -34,6 +39,7 @@ func calculateIssLocation(timeToCheck time.Time) issCoords {
 	iss := satellite.TLEToSat(ISS_LINE_1, ISS_LINE_2, ISS_GRAVITY)
 	position, _ := satellite.Propagate(iss, timeToCheck.Year(), int(timeToCheck.Month()), timeToCheck.Day(), timeToCheck.Hour(),
 		timeToCheck.Minute(), timeToCheck.Second())
+
 	// Calculate julian day to find theta to calculate latitde, longitude, and altitude
 	jday := satellite.JDay(timeToCheck.Year(), int(timeToCheck.Month()), timeToCheck.Day(), timeToCheck.Hour(), timeToCheck.Minute(), timeToCheck.Second())
 	theta := satellite.ThetaG_JD(jday)
@@ -58,5 +64,8 @@ func calculateIssLocation(timeToCheck time.Time) issCoords {
 	for longitudeInDeg > 180 {
 		longitudeInDeg -= 360
 	}
-	return issCoords{Latitude: latitudeInDeg, Longitude: longitudeInDeg, Altitude: altitude}
+
+	foundCoords := issCoords{Latitude: latitudeInDeg, Longitude: longitudeInDeg, Altitude: altitude}
+	calculatedLocations[timeToCheck] = foundCoords
+	return foundCoords
 }
